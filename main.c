@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#define PAD 85
+
 void swap(int *a, int *b) {
     int temp = *a;
     *a = *b;
@@ -38,8 +40,34 @@ void insertion_sort(int arr[], int n) {
     }
 }
 
+// pivot type:
+// 0 = first element
+// 1 = last element
+// 2 = random element
+// 3 = median of three
 /* this uses Hoare's partition procedure */
-int partition(int arr[], int p, int r) {
+int partition(int arr[], int p, int r, int pivotType) {
+    //determine pivot index
+    int pivotIndex = p;
+    if(pivotType == 1)
+	    pivotIndex = r;
+    if(pivotType == 2)
+	    pivotIndex = p + rand() % (r-p+1);
+    if(pivotType == 3){
+    	int m = (p+r) / 2;
+	//determine the median value
+	if(arr[p] < arr[m] && arr[m] < arr[r])
+		pivotIndex = m;
+	else if(arr[p] < arr[r] && arr[r] < arr[m])
+		pivotIndex = r;
+	else
+		pivotIndex = p;
+    
+    }
+
+    //swap pivot into arr[p]
+    swap(&arr[p], &arr[pivotIndex]);
+
     int x = arr[p]; // selects the first element as the initial pivot
     int i = p - 1;
     int j = r + 1;
@@ -54,13 +82,13 @@ int partition(int arr[], int p, int r) {
 }
 
 /* for an input array with n elements (i.e., arr[0..n-1]) p = 0 and r = n - 1 */
-void quick_sort(int arr[], int p, int r) {
+void quick_sort(int arr[], int p, int r, int pivotType) {
     if (p < r) {
         /* find index q, such that every element in arr[p, q] is less than or equal to every element in arr[q + 1, r] */
-        int q = partition(arr, p, r);
+        int q = partition(arr, p, r, pivotType);
         /* recursively call quicksort on both sub-arrays */
-        quick_sort(arr, p, q);
-        quick_sort(arr, q + 1, r);
+        quick_sort(arr, p, q, pivotType);
+        quick_sort(arr, q + 1, r, pivotType);
     }
 }
 
@@ -72,7 +100,7 @@ void hybrid_quick_sort(int arr[], int p, int r, int threshold) { // add extra "t
         }
 
         else {
-            int q = partition(arr, p, r);
+            int q = partition(arr, p, r, 0); //use default pivot type for this
             if (q - p < r - q) {
                 hybrid_quick_sort(arr, p, q, threshold);
                 p = q + 1;
@@ -86,92 +114,97 @@ void hybrid_quick_sort(int arr[], int p, int r, int threshold) { // add extra "t
     }
 }
 
+void runQuicksort(char* file, int pivotType)
+{
+	clock_t start, end;
+	int n = 100000;
+	int input[n];
+	parse_file(file, input, n);
+
+	start = clock();
+	quick_sort(input, 0, n-1, pivotType);
+	end = clock();
+	printf("%8.5f s\n", seconds_taken(start, end));
+}
+
+void runHybridQuicksort(char* file, int threshold)
+{
+	clock_t start, end;
+	int n = 100000;
+	int input[n];
+	parse_file(file, input, n);
+
+	start = clock();
+	quick_sort(input, 0, n-1, threshold);
+	end = clock();
+	printf("%8.5f s\n", seconds_taken(start, end));
+}
+
 int main(void) {
-    clock_t start, end;
 
-    int n = 100000;
+    /* sorted elements */
+    char *msg = "quicksort on 100,000 sorted elements with last element pivot:";
+    printf("%-*s", PAD, msg);
+    runQuicksort("ordered100000.txt", 0);
 
-    /* quicksort on 100,000 already sorted elements */
-    int input1[n];
-    parse_file("ordered100000.txt", input1, n);
+    msg = "quicksort on 100,000 sorted elements with first element pivot: ";
+    printf("%-*s", PAD, msg);
+    runQuicksort("ordered100000.txt", 1);
 
-    start = clock();
-    quick_sort(input1, 0, n - 1);
-    end = clock();
-    printf("quicksort(100000 sorted): %8fs\n",
-           seconds_taken(start, end));
+    msg = "quicksort on 100,000 sorted elements with random element pivot: ";
+    printf("%-*s", PAD, msg);
+    runQuicksort("ordered100000.txt", 2);
 
-    /* quicksort on 100,000 randomly ordered elements */
-    int input2[n];
-    parse_file("shuf100000.txt", input2, n);
+    msg = "quicksort on 100,000 sorted elements with median-of-three element pivot: ";
+    printf("%-*s", PAD, msg);
+    runQuicksort("ordered100000.txt", 3);
 
-    start = clock();
-    quick_sort(input2, 0, n - 1);
-    end = clock();
-    printf("quicksort(100000 unsorted): %8fs\n",
-           seconds_taken(start, end));
+    /* unsorted elements */
+    msg = "quicksort on 100,000 randomly sorted elements with last element pivot: ";
+    printf("%-*s", PAD, msg);
+    runQuicksort("shuf100000.txt", 0);
 
-    // C++ Sorting algorithm switches at 16
-    /* hybrid quick sort on 100,000 already sorted elements with threshold 16 */
-    int input3[n];
-    parse_file("ordered100000.txt", input3, n);
+    msg = "quicksort on 100,000 randomly sorted elements with first element pivot: ";
+    printf("%-*s", PAD, msg);
+    runQuicksort("shuf100000.txt", 1);
 
-    start = clock();
-    hybrid_quick_sort(input3, 0, n - 1, 16);
-    end = clock();
-    printf("hybrid_quicksort_16(100000 sorted): %8fs\n",
-           seconds_taken(start, end));
+    msg = "quicksort on 100,000 randomly sorted elements with random element pivot: ";
+    printf("%-*s", PAD, msg);
+    runQuicksort("shuf100000.txt", 2);
 
-    /* hybrid quick sort on 100,000 randomly ordered elements with threshold 16 */
-    int input4[n];
-    parse_file("shuf100000.txt", input4, n);
+    msg = "quicksort on 100,000 randomly sorted elements with median-of-three element pivot: ";
+    printf("%-*s", PAD, msg);
+    runQuicksort("shuf100000.txt", 3);
 
-    start = clock();
-    hybrid_quick_sort(input4, 0, n - 1, 16);
-    end = clock();
-    printf("hybrid_quicksort_16(100000 unsorted): %8fs\n",
-           seconds_taken(start, end));
+    /* Hybrid Quicksort */
+    msg = "hybrid quicksort on 100,000 sorted elements with threshold 16: ";
+    printf("%-*s", PAD, msg);
+    runHybridQuicksort("ordered100000.txt", 16);
 
-    /* hybrid quick sort on 100,000 already sorted elements with threshold 32 */
-    int input5[n];
-    parse_file("ordered100000.txt", input5, n);
-
-    start = clock();
-    hybrid_quick_sort(input5, 0, n - 1, 32);
-    end = clock();
-    printf("hybrid_quicksort_32(100000 sorted): %8fs\n",
-           seconds_taken(start, end));
-
-    /* hybrid quick sort on 100,000 randomly ordered elements with threshold 32 */
-    int input6[n];
-    parse_file("shuf100000.txt", input6, n);
-
-    start = clock();
-    hybrid_quick_sort(input6, 0, n - 1, 32);
-    end = clock();
-    printf("hybrid_quicksort_32(100000 unsorted): %8fs\n",
-           seconds_taken(start, end));
+    /* sorted elements */
+    msg = "hybrid quicksort on 100,000 sorted elements with threshold 32: ";
+    printf("%-*s", PAD, msg);
+    runHybridQuicksort("ordered100000.txt", 32);
 
     // Java Quicksort switches at 44
-    /* hybrid quick sort on 100,000 already sorted elements with threshold 44 */
-    int input7[n];
-    parse_file("ordered100000.txt", input7, n);
+    msg = "hybrid quicksort on 100,000 sorted elements with threshold 44: ";
+    printf("%-*s", PAD, msg);
+    runHybridQuicksort("ordered100000.txt", 44);
 
-    start = clock();
-    hybrid_quick_sort(input7, 0, n - 1, 44);
-    end = clock();
-    printf("hybrid_quicksort_44(100000 sorted): %8fs\n",
-           seconds_taken(start, end));
+    /* unsorted elements */
+    msg = "hybrid quicksort on 100,000 randomly sorted elements with threshold 16: ";
+    printf("%-*s", PAD, msg);
+    runHybridQuicksort("shuf100000.txt", 16);
 
-    /* hybrid quick sort on 100,000 randomly ordered elements with threshold 44 */
-    int input8[n];
-    parse_file("shuf100000.txt", input8, n);
+    msg = "hybrid quicksort on 100,000 randomly sorted elements with threshold 32: ";
+    printf("%-*s", PAD, msg);
+    runHybridQuicksort("shuf100000.txt", 32);
 
-    start = clock();
-    hybrid_quick_sort(input8, 0, n - 1, 44);
-    end = clock();
-    printf("hybrid_quicksort_44(100000 unsorted): %8fs\n",
-           seconds_taken(start, end));
+    // Java Quicksort switches at 44
+    msg = "hybrid quicksort on 100,000 randomly sorted elements with threshold 44: ";
+    printf("%-*s", PAD, msg);
+    runHybridQuicksort("shuf100000.txt", 44);
 
+   
     return 0;
 }

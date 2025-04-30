@@ -1,9 +1,21 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 void swap(int *a, int *b) {
     int temp = *a;
     *a = *b;
     *b = temp;
+}
+
+void parse_file(char *path, int *arr, int max_size) {
+    FILE *file = fopen(path, "r");
+    char line[256];
+
+    int i = 0;
+    while (i < max_size && fgets(line, sizeof(line), file)) {
+        arr[i++] = atoi(line);
+    }
 }
 
 /* n = number of elements in the input array arr */
@@ -49,21 +61,34 @@ void quick_sort(int arr[], int p, int r) {
 }
 
 int main(void) {
-    /* short example input */
-    int arr[] = { 3, 9, 1, 6, 0, 8, 2, 5, 4, 7 };
-    int n = 10;
+    clock_t start, end;
+    double time_taken;
 
-    printf("unsorted: ");
-    for (int i = 0; i < n; i++)
-        printf("%d ", arr[i]);
-    printf("\n");
+    /* quicksort on 1,000,000 already sorted elements */
+    int n1 = 100000;
+    int input1[n1];
+    parse_file("ordered100000.txt", input1, n1);
 
-    quick_sort(arr, 0, n - 1);
+    start = clock();
 
-    printf("sorted:   ");
-    for (int i = 0; i < n; i++)
-        printf("%d ", arr[i]);
-    printf("\n");
+    quick_sort(input1, 0, n1 - 1);
+
+    end = clock();
+    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("quicksort(100000 sorted): %8fs\n", time_taken);
+
+    /* quicksort on 1,000,000 randomly ordered elements */
+    int n2 = 100000;
+    int input2[n2];
+    parse_file("shuf100000.txt", input2, n2);
+
+    start = clock();
+
+    quick_sort(input2, 0, n2 - 1);
+
+    end = clock();
+    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("quicksort(100000 unsorted): %8fs\n", time_taken);
 
     return 0;
 }

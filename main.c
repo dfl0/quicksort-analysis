@@ -60,6 +60,28 @@ void quick_sort(int arr[], int p, int r) {
     }
 }
 
+void hybrid_quick_sort(int arr[], int p, int r, int threshold) { // add extra "threshold parameter to test multiple thresholds
+    while (p < r) {
+        if (r - p + 1 < threshold) { // if in threshold, sort using insertion sort
+            insertion_sort(arr + p, r - p + 1);
+            break;
+        }
+
+        else {
+            int q = partition(arr, p, r);
+            if (q - p < r - q) {
+                hybrid_quick_sort(arr, p, q, threshold);
+                p = q + 1;
+            }
+
+            else {
+                hybrid_quick_sort(arr, q + 1, r, threshold);
+                r = q;
+            }
+        }
+    }
+}
+
 int main(void) {
     clock_t start, end;
     double time_taken;
@@ -89,6 +111,56 @@ int main(void) {
     end = clock();
     time_taken = (double)(end - start) / CLOCKS_PER_SEC;
     printf("quicksort(100000 unsorted): %8fs\n", time_taken);
+
+    // C++ Sorting algorithm switches at 16
+    /* hybrid quick sort on 1,000,000 already sorted elements with threshold 16 */
+    start = clock();
+    hybrid_quick_sort(input1, 0, n1 - 1, 16);
+
+    end = clock();
+    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("hybrid_quicksort_16(1000000 sorted): %8fs\n", time_taken);
+
+    /* hybrid quick sort on 1,000,000 randomly ordered elements with threshold 16 */
+    start = clock();
+    hybrid_quick_sort(input2, 0, n2 - 1, 16);
+
+    end = clock();
+    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("hybrid_quicksort_16(1000000 unsorted): %8fs\n", time_taken);
+
+    /* hybrid quick sort on 1,000,000 already sorted elements with threshold 32 */
+    start = clock();
+    hybrid_quick_sort(input1, 0, n1 - 1, 32);
+
+    end = clock();
+    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("hybrid_quicksort_32(1000000 sorted): %8fs\n", time_taken);
+
+    /* hybrid quick sort on 1,000,000 randomly ordered elements with threshold 32 */
+    start = clock();
+    hybrid_quick_sort(input2, 0, n2 - 1, 32);
+
+    end = clock();
+    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("hybrid_quicksort_32(1000000 unsorted): %8fs\n", time_taken);
+
+    // Java Quicksort switches at 44
+    /* hybrid quick sort on 1,000,000 already sorted elements with threshold 44 */
+    start = clock();
+    hybrid_quick_sort(input1, 0, n1 - 1, 16);
+
+    end = clock();
+    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("hybrid_quicksort_44(1000000 sorted): %8fs\n", time_taken);
+
+    /* hybrid quick sort on 1,000,000 randomly ordered elements with threshold 44 */
+    start = clock();
+    hybrid_quick_sort(input2, 0, n2 - 1, 16);
+
+    end = clock();
+    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("hybrid_quicksort_44(1000000 unsorted): %8fs\n", time_taken);
 
     return 0;
 }

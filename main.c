@@ -18,6 +18,10 @@ void parse_file(char *path, int *arr, int max_size) {
     }
 }
 
+double seconds_taken(clock_t start, clock_t end) {
+    return (double)(end - start) / CLOCKS_PER_SEC;
+}
+
 /* n = number of elements in the input array arr */
 void insertion_sort(int arr[], int n) {
     /* for every element starting from the second ... */
@@ -84,83 +88,90 @@ void hybrid_quick_sort(int arr[], int p, int r, int threshold) { // add extra "t
 
 int main(void) {
     clock_t start, end;
-    double time_taken;
 
-    /* quicksort on 1,000,000 already sorted elements */
-    int n1 = 100000;
-    int input1[n1];
-    parse_file("ordered100000.txt", input1, n1);
+    int n = 100000;
 
-    start = clock();
-
-    quick_sort(input1, 0, n1 - 1);
-
-    end = clock();
-    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("quicksort(100000 sorted): %8fs\n", time_taken);
-
-    /* quicksort on 1,000,000 randomly ordered elements */
-    int n2 = 100000;
-    int input2[n2];
-    parse_file("shuf100000.txt", input2, n2);
+    /* quicksort on 100,000 already sorted elements */
+    int input1[n];
+    parse_file("ordered100000.txt", input1, n);
 
     start = clock();
-
-    quick_sort(input2, 0, n2 - 1);
-
+    quick_sort(input1, 0, n - 1);
     end = clock();
-    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("quicksort(100000 unsorted): %8fs\n", time_taken);
+    printf("quicksort(100000 sorted): %8fs\n",
+           seconds_taken(start, end));
+
+    /* quicksort on 100,000 randomly ordered elements */
+    int input2[n];
+    parse_file("shuf100000.txt", input2, n);
+
+    start = clock();
+    quick_sort(input2, 0, n - 1);
+    end = clock();
+    printf("quicksort(100000 unsorted): %8fs\n",
+           seconds_taken(start, end));
 
     // C++ Sorting algorithm switches at 16
-    /* hybrid quick sort on 1,000,000 already sorted elements with threshold 16 */
+    /* hybrid quick sort on 100,000 already sorted elements with threshold 16 */
+    int input3[n];
+    parse_file("ordered100000.txt", input3, n);
+
     start = clock();
-    hybrid_quick_sort(input1, 0, n1 - 1, 16);
-
+    hybrid_quick_sort(input3, 0, n - 1, 16);
     end = clock();
-    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("hybrid_quicksort_16(1000000 sorted): %8fs\n", time_taken);
+    printf("hybrid_quicksort_16(100000 sorted): %8fs\n",
+           seconds_taken(start, end));
 
-    /* hybrid quick sort on 1,000,000 randomly ordered elements with threshold 16 */
+    /* hybrid quick sort on 100,000 randomly ordered elements with threshold 16 */
+    int input4[n];
+    parse_file("shuf100000.txt", input4, n);
+
     start = clock();
-    hybrid_quick_sort(input2, 0, n2 - 1, 16);
-
+    hybrid_quick_sort(input4, 0, n - 1, 16);
     end = clock();
-    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("hybrid_quicksort_16(1000000 unsorted): %8fs\n", time_taken);
+    printf("hybrid_quicksort_16(100000 unsorted): %8fs\n",
+           seconds_taken(start, end));
 
-    /* hybrid quick sort on 1,000,000 already sorted elements with threshold 32 */
+    /* hybrid quick sort on 100,000 already sorted elements with threshold 32 */
+    int input5[n];
+    parse_file("ordered100000.txt", input5, n);
+
     start = clock();
-    hybrid_quick_sort(input1, 0, n1 - 1, 32);
-
+    hybrid_quick_sort(input5, 0, n - 1, 32);
     end = clock();
-    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("hybrid_quicksort_32(1000000 sorted): %8fs\n", time_taken);
+    printf("hybrid_quicksort_32(100000 sorted): %8fs\n",
+           seconds_taken(start, end));
 
-    /* hybrid quick sort on 1,000,000 randomly ordered elements with threshold 32 */
+    /* hybrid quick sort on 100,000 randomly ordered elements with threshold 32 */
+    int input6[n];
+    parse_file("shuf100000.txt", input6, n);
+
     start = clock();
-    hybrid_quick_sort(input2, 0, n2 - 1, 32);
-
+    hybrid_quick_sort(input6, 0, n - 1, 32);
     end = clock();
-    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("hybrid_quicksort_32(1000000 unsorted): %8fs\n", time_taken);
+    printf("hybrid_quicksort_32(100000 unsorted): %8fs\n",
+           seconds_taken(start, end));
 
     // Java Quicksort switches at 44
-    /* hybrid quick sort on 1,000,000 already sorted elements with threshold 44 */
+    /* hybrid quick sort on 100,000 already sorted elements with threshold 44 */
+    int input7[n];
+    parse_file("ordered100000.txt", input7, n);
+
     start = clock();
-    hybrid_quick_sort(input1, 0, n1 - 1, 16);
-
+    hybrid_quick_sort(input7, 0, n - 1, 44);
     end = clock();
-    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("hybrid_quicksort_44(1000000 sorted): %8fs\n", time_taken);
+    printf("hybrid_quicksort_44(100000 sorted): %8fs\n",
+           seconds_taken(start, end));
 
-    /* hybrid quick sort on 1,000,000 randomly ordered elements with threshold 44 */
+    /* hybrid quick sort on 100,000 randomly ordered elements with threshold 44 */
+    int input8[n];
+    parse_file("shuf100000.txt", input8, n);
+
     start = clock();
-    hybrid_quick_sort(input2, 0, n2 - 1, 16);
-
+    hybrid_quick_sort(input8, 0, n - 1, 44);
     end = clock();
-    time_taken = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("hybrid_quicksort_44(1000000 unsorted): %8fs\n", time_taken);
+    printf("hybrid_quicksort_44(100000 unsorted): %8fs\n",
+           seconds_taken(start, end));
 
     return 0;
 }

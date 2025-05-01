@@ -1,1 +1,1 @@
-just compile with gcc main.c -o main and run!
+just compile with `gcc main.c -o main` and run `./main`!

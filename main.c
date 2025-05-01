@@ -4,10 +4,13 @@
 
 #define PAD 85
 
+int swaps; // keep track of number of swaps
+
 void swap(int *a, int *b) {
     int temp = *a;
     *a = *b;
     *b = temp;
+    swaps++;
 }
 
 void parse_file(char *path, int *arr, int max_size) {
@@ -62,7 +65,6 @@ int partition(int arr[], int p, int r, int pivotType) {
 		pivotIndex = r;
 	else
 		pivotIndex = p;
-    
     }
 
     //swap pivot into arr[p]
@@ -121,10 +123,11 @@ void runQuicksort(char* file, int pivotType)
 	int input[n];
 	parse_file(file, input, n);
 
+    swaps = 0;
 	start = clock();
 	quick_sort(input, 0, n-1, pivotType);
 	end = clock();
-	printf("%8.5f s\n", seconds_taken(start, end));
+	printf("%8.5f s  (%d swaps)\n", seconds_taken(start, end), swaps);
 }
 
 void runHybridQuicksort(char* file, int threshold)
@@ -134,14 +137,14 @@ void runHybridQuicksort(char* file, int threshold)
 	int input[n];
 	parse_file(file, input, n);
 
+    swaps = 0;
 	start = clock();
 	quick_sort(input, 0, n-1, threshold);
 	end = clock();
-	printf("%8.5f s\n", seconds_taken(start, end));
+	printf("%8.5f s  (%d swaps)\n", seconds_taken(start, end), swaps);
 }
 
 int main(void) {
-
     /* sorted elements */
     char *msg = "quicksort on 100,000 sorted elements with last element pivot:";
     printf("%-*s", PAD, msg);
@@ -158,6 +161,23 @@ int main(void) {
     msg = "quicksort on 100,000 sorted elements with median-of-three element pivot: ";
     printf("%-*s", PAD, msg);
     runQuicksort("ordered100000.txt", 3);
+
+    /* reverse order elements */
+    msg = "quicksort on 100,000 elements in reverse order with last element pivot: ";
+    printf("%-*s", PAD, msg);
+    runQuicksort("rev100000.txt", 0);
+
+    msg = "quicksort on 100,000 elements in reverse order with first element pivot: ";
+    printf("%-*s", PAD, msg);
+    runQuicksort("rev100000.txt", 1);
+
+    msg = "quicksort on 100,000 elements in reverse order with random element pivot: ";
+    printf("%-*s", PAD, msg);
+    runQuicksort("rev100000.txt", 2);
+
+    msg = "quicksort on 100,000 elements in reverse order with median-of-three element pivot: ";
+    printf("%-*s", PAD, msg);
+    runQuicksort("rev100000.txt", 3);
 
     /* unsorted elements */
     msg = "quicksort on 100,000 randomly sorted elements with last element pivot: ";
@@ -176,12 +196,14 @@ int main(void) {
     printf("%-*s", PAD, msg);
     runQuicksort("shuf100000.txt", 3);
 
+
     /* Hybrid Quicksort */
+
+    /* sorted elements */
     msg = "hybrid quicksort on 100,000 sorted elements with threshold 16: ";
     printf("%-*s", PAD, msg);
     runHybridQuicksort("ordered100000.txt", 16);
 
-    /* sorted elements */
     msg = "hybrid quicksort on 100,000 sorted elements with threshold 32: ";
     printf("%-*s", PAD, msg);
     runHybridQuicksort("ordered100000.txt", 32);
@@ -190,6 +212,20 @@ int main(void) {
     msg = "hybrid quicksort on 100,000 sorted elements with threshold 44: ";
     printf("%-*s", PAD, msg);
     runHybridQuicksort("ordered100000.txt", 44);
+
+    /* reverse order elements */
+    msg = "hybrid quicksort on 100,000 elements in reverse order with threshold 16: ";
+    printf("%-*s", PAD, msg);
+    runHybridQuicksort("rev100000.txt", 16);
+
+    msg = "hybrid quicksort on 100,000 elements in reverse order with threshold 32: ";
+    printf("%-*s", PAD, msg);
+    runHybridQuicksort("rev100000.txt", 32);
+
+    // Java Quicksort switches at 44
+    msg = "hybrid quicksort on 100,000 elements in reverse order with threshold 44: ";
+    printf("%-*s", PAD, msg);
+    runHybridQuicksort("rev100000.txt", 44);
 
     /* unsorted elements */
     msg = "hybrid quicksort on 100,000 randomly sorted elements with threshold 16: ";
@@ -205,6 +241,5 @@ int main(void) {
     printf("%-*s", PAD, msg);
     runHybridQuicksort("shuf100000.txt", 44);
 
-   
     return 0;
 }

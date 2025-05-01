@@ -139,7 +139,7 @@ void runHybridQuicksort(char* file, int threshold)
 
     swaps = 0;
 	start = clock();
-	quick_sort(input, 0, n-1, threshold);
+	hybrid_quick_sort(input, 0, n-1, threshold);
 	end = clock();
 	printf("%8.5f s  (%d swaps)\n", seconds_taken(start, end), swaps);
 }
